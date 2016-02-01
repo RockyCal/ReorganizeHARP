@@ -4,8 +4,9 @@
     <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.5.2" />
   </startup>
   <appSettings>
-    <add key="host" value="enterYourHostNameHere"/>
+    <add key="hostName" value="enterYourHostNameHere"/>
     <add key="userName" value="enterYourUserNameHere"/>
     <add key="password" value="enterYourPasswordHere"/>
+    <add key="sshHostKeyFingerprint" value="entersshHostKeyFingerprintHere"/>
   </appSettings>
 </configuration>

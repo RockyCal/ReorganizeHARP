@@ -1,6 +1,7 @@
 ﻿using System;
 using WinSCP;
 using System.Configuration;
+using System.Text.RegularExpressions;
 
 namespace ReorganizeHARP
 {
@@ -22,21 +23,34 @@ namespace ReorganizeHARP
 
                 using (Session session = new Session())
                 {
-                    System.Diagnostics.Debug.Write("made it to here");
                     // Connect
                     session.Open(sessionOptions);
 
-                    RemoteDirectoryInfo directory = session.ListDirectory("/home/cetus/shared/HARP^ Deployment^ and^ Recovery^ Files");
+                    RemoteDirectoryInfo directory = session.ListDirectory("/home/cetus/shared/HARP Deployment and Recovery Files");
+                    int numFiles = directory.Files.Count - 2; // Files.Count includes "." and ".." references
+                    System.Diagnostics.Debug.WriteLine(numFiles);
+                    RemoteFileInfo[] files = new RemoteFileInfo[numFiles]; // to hold file names that will be sorted
+                    int idx = 0;
                     foreach (RemoteFileInfo fileInfo in directory.Files)
                     {
-                        System.Diagnostics.Debug.Write("{0}", fileInfo.Name);
+                        if (!(Regex.IsMatch(fileInfo.Name, @"^\.")))
+                        {
+                            files[idx] = fileInfo;
+                            idx++;
+                        }
+                    }
+                    // Sort files alphabetically
+                    Array.Sort(files, (x, y) => String.Compare(x.Name, y.Name));
+                    foreach (RemoteFileInfo fileInfo in files)
+                    {
+                        System.Diagnostics.Debug.WriteLine(fileInfo.Name);
                     }
                 }
                 return 0;
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.Write("Error: {0}", e.ToString());
+                System.Diagnostics.Debug.WriteLine("Error: {0}", e);
                 return 1;
             }
         }
