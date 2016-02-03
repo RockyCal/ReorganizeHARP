@@ -1,6 +1,7 @@
 ﻿using System;
 using WinSCP;
 using System.Configuration;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace ReorganizeHARP
@@ -27,20 +28,22 @@ namespace ReorganizeHARP
                     session.Open(sessionOptions);
 
                     RemoteDirectoryInfo directory = session.ListDirectory("/home/cetus/shared/HARP Deployment and Recovery Files");
-                    int numFiles = directory.Files.Count - 2; // Files.Count includes "." and ".." references
-                    System.Diagnostics.Debug.WriteLine(numFiles);
-                    RemoteFileInfo[] files = new RemoteFileInfo[numFiles]; // to hold file names that will be sorted
-                    int idx = 0;
+                    List<RemoteFileInfo> files = new List<RemoteFileInfo>(); // to hold file names that will be sorted
                     foreach (RemoteFileInfo fileInfo in directory.Files)
                     {
-                        if (!(Regex.IsMatch(fileInfo.Name, @"^\.")))
+                        if (!(Regex.IsMatch(fileInfo.Name, @"^\.")) && !(Regex.IsMatch(fileInfo.Name, @"^\d")))
                         {
-                            files[idx] = fileInfo;
-                            idx++;
+                            files.Add(fileInfo);
                         }
                     }
                     // Sort files alphabetically
-                    Array.Sort(files, (x, y) => String.Compare(x.Name, y.Name));
+                    files.Sort(delegate (RemoteFileInfo x, RemoteFileInfo y)
+                    {
+                        if (x.Name == null && y.Name == null) return 0;
+                        else if (x.Name == null) return -1;
+                        else if (y.Name == null) return 1;
+                        else return x.Name.CompareTo(y.Name);
+                    });
                     foreach (RemoteFileInfo fileInfo in files)
                     {
                         System.Diagnostics.Debug.WriteLine(fileInfo.Name);
