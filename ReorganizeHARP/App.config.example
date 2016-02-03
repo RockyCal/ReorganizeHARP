@@ -8,5 +8,9 @@
     <add key="userName" value="enterYourUserNameHere"/>
     <add key="password" value="enterYourPasswordHere"/>
     <add key="sshHostKeyFingerprint" value="entersshHostKeyFingerprintHere"/>
+    <add key="dbServerName" value="enterNameofDBServerHere"/>
+    <add key="dbName" value="enterDbNameHere"/>
+    <add key="dbUserName" value="enterDBUserNameHere"/>
+    <add key="dbPassword" value="enterDBPasswordHere"/>
   </appSettings>
 </configuration>
