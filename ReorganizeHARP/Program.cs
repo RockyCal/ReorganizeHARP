@@ -23,9 +23,9 @@ namespace ReorganizeHARP
 
             System.Diagnostics.Debug.WriteLine(connectionString);
             SqlConnection cnn = new SqlConnection(connectionString);
+            // Connect to DB
             try
             {
-                // Connect to DB
                 cnn.Open();
                 Console.WriteLine("Attempting to connect to SQL server...");
                 System.Diagnostics.Debug.WriteLine("Connection Open!");
@@ -55,19 +55,20 @@ namespace ReorganizeHARP
                     // Connect
                     session.Open(sessionOptions);
                     Console.WriteLine("Connected to session.");
-                    RemoteDirectoryInfo directory = session.ListDirectory("/home/cetus/shared/HARP Deployment and Recovery Files");
-                    List<RemoteFileInfo> files = new List<RemoteFileInfo>(); // to hold file names that will be sorted
+                    String path = "/home/cetus/shared/HARP Deployment and Recovery Files";
+                    RemoteDirectoryInfo directory = session.ListDirectory(path);
+                    List<RemoteFileInfo> expenditions = new List<RemoteFileInfo>(); // to hold file names that will be sorted
                     foreach (RemoteFileInfo fileInfo in directory.Files)
                     {
-                        if (!(Regex.IsMatch(fileInfo.Name, @"^\.")) && !(Regex.IsMatch(fileInfo.Name, @"^\d")))
+                        if (!(Regex.IsMatch(fileInfo.Name, @"^\.")) && !(Regex.IsMatch(fileInfo.Name, @"^\d")) && fileInfo.IsDirectory)
                         {
-                            files.Add(fileInfo);
+                            expenditions.Add(fileInfo);
                         }
                     }
                     Console.WriteLine("Files found, processing and sorting");
 
                     // Sort files alphabetically
-                    files.Sort(delegate (RemoteFileInfo x, RemoteFileInfo y)
+                    expenditions.Sort(delegate (RemoteFileInfo x, RemoteFileInfo y)
                     {
                         if (x.Name == null && y.Name == null) return 0;
                         else if (x.Name == null) return -1;
@@ -75,19 +76,29 @@ namespace ReorganizeHARP
                         else return y.Name.CompareTo(x.Name);
                     });
 
-                    foreach (RemoteFileInfo fileInfo in files)
+                    Boolean done = false;
+                    int i = 0;
+                    while (!done)
                     {
-                        Console.WriteLine("Would you like to organize {0}(Y/N)?", fileInfo.Name);
+                        Console.WriteLine("[E]xit [Y]es [Any key to continue]");
+                        RemoteFileInfo expedition = expenditions[i];
+                        Console.WriteLine("Would you like to organize {0}(Y/N)?", expedition.Name);
                         String answer = Console.ReadLine();
-                        if(answer == "Y")
+                        switch (answer)
                         {
-                            Console.WriteLine(fileInfo.Name);
+                            case "Y":
+                                Console.WriteLine(expedition.Name);
+                                //FileTransferManager fileTransfer = new FileTransferManager();
+                                break;
+                            case "N":
+                                break;
+                            case "E":
+                                done = true;
+                                break;
+                            default:
+                                continue;
                         }
-                        else
-                        {
-                            Console.WriteLine("bye!");
-                            break;
-                        }
+                        i++;
                     }
                     return 0;
                 }
