@@ -87,8 +87,8 @@ namespace ReorganizeHARP
                         switch (answer)
                         {
                             case "Y":
-                                Console.WriteLine(expedition.Name);
-                                //FileTransferManager fileTransfer = new FileTransferManager();
+                                FileTransferManager fileTransfer = new FileTransferManager(path, session, expedition);
+                                fileTransfer.createNewTarget();
                                 break;
                             case "N":
                                 break;

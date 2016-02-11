@@ -10,41 +10,33 @@ namespace ReorganizeHARP
     class FileTransferManager
     {
         public String path;
-        public RemoteFileInfo expedition;
+        public RemoteFileInfo expedition;  // the expedition as a file info object
         public Session session;
+        public RemoteDirectoryInfo exp;    // the expedition directory
+        public String expPath;             // the path to the expedition directory
 
-        public FileTransferManager(String ppath, Session psession, RemoteFileInfo pexpedition)
+        public FileTransferManager(String srcPath, Session ftpSession, RemoteFileInfo expeditionFile)
         {
-            path = ppath;
-            expedition = pexpedition;
-            session = psession;
-        }
-        public void getFiles()
-        {
-            String expPath = path + '/' + expedition.Name;
+            path = srcPath;
+            session = ftpSession;
+            expedition = expeditionFile;
+            expPath = path + '/' + expedition.Name;
             // Select expedition directory
-            RemoteDirectoryInfo exp = session.ListDirectory(expPath);
-            // Find deployment files
-            String deployPath = expPath + "/deploy";
-            try
-            {
-                RemoteDirectoryInfo expDeployment = session.ListDirectory(deployPath);
-            }
-            catch (SessionRemoteException e)
-            {
-                try
-                {
-                    deployPath = expPath + "/Deploy";
-                    RemoteDirectoryInfo expDeployment = session.ListDirectory(deployPath);
-                }
-                catch (SessionRemoteException ex)
-                {
-
-                }
-            }
-            // Find recovery files
-            String recoveryPath = expPath + "/recovery";
-            RemoteDirectoryInfo expRecovery = session.ListDirectory(recoveryPath);
+            exp = session.ListDirectory(expPath);
+        }
+        
+        public void createNewTarget()
+        {
+            Console.WriteLine("Set target name: ");
+            String targetName = Console.ReadLine();
+            //Console.WriteLine("Set target directory name (the name of the directory where the files you want are hosted):");
+            //String dirName = Console.ReadLine();
+            Console.WriteLine("Set target path (where to find your target's files) ex: deploy/dl32: ");
+            String targetPath = Console.ReadLine();
+            FileTransferTarget target = new FileTransferTarget(targetName, session);
+            String fullpath = expPath + '/' + targetPath;
+            target.setFullPath(fullpath);
+            target.findTargetFiles();
         }
     }
 }
