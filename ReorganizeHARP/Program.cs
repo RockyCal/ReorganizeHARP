@@ -9,9 +9,8 @@ namespace ReorganizeHARP
 {
     class Program
     {
-        public static int Main(string[] args)
+        public static void connectToDb()
         {
-            /*
             // Setup data connection (for cross-referencing ftp files with database tuples)
             string dbServer = ConfigurationManager.AppSettings["dbServerName"];
             string dbName = ConfigurationManager.AppSettings["dbName"];
@@ -36,8 +35,13 @@ namespace ReorganizeHARP
                 System.Diagnostics.Debug.WriteLine("Can not open connection!");
                 System.Diagnostics.Debug.WriteLine("{0}", ex);
             }
-            */
+        }
+        
+        public static int Main(string[] args)
+        {
+            //connectToDb();
             Console.WriteLine("Let's reorganize some files!");
+
             try
             {
                 // Setup session
@@ -55,20 +59,22 @@ namespace ReorganizeHARP
                     // Connect
                     session.Open(sessionOptions);
                     Console.WriteLine("Connected to session.");
+                    // TODO: make source path editable
                     String path = "/home/cetus/shared/HARP Deployment and Recovery Files";
+                    Console.WriteLine("Source path is {0}", path);
                     RemoteDirectoryInfo directory = session.ListDirectory(path);
-                    List<RemoteFileInfo> expenditions = new List<RemoteFileInfo>(); // to hold file names that will be sorted
+                    List<RemoteFileInfo> sourceFiles = new List<RemoteFileInfo>(); // to hold file names that will be sorted
                     foreach (RemoteFileInfo fileInfo in directory.Files)
                     {
                         if (!(Regex.IsMatch(fileInfo.Name, @"^\.")) && !(Regex.IsMatch(fileInfo.Name, @"^\d")) && fileInfo.IsDirectory)
                         {
-                            expenditions.Add(fileInfo);
+                            sourceFiles.Add(fileInfo);
                         }
                     }
-                    Console.WriteLine("Files found, processing and sorting");
+                    Console.WriteLine("Files found, processing and sorting.");
 
                     // Sort files alphabetically
-                    expenditions.Sort(delegate (RemoteFileInfo x, RemoteFileInfo y)
+                    sourceFiles.Sort(delegate (RemoteFileInfo x, RemoteFileInfo y)
                     {
                         if (x.Name == null && y.Name == null) return 0;
                         else if (x.Name == null) return -1;
@@ -76,19 +82,43 @@ namespace ReorganizeHARP
                         else return y.Name.CompareTo(x.Name);
                     });
 
+                    // Destination path of where the directories holding the targets willbe temporarily held until transferred back to session
+                    String destPath = "C:/Users/Harp/Desktop/temp";
+                    // TODO: make destination path editable
+                    Console.WriteLine("Destination path is {0}", destPath);
+                    FileTransferManager fileTransfer = new FileTransferManager(path, destPath, session);
+                    Boolean doneTargets = false;
+                    while (!doneTargets)
+                    {
+                        Console.WriteLine("Create new target? (Y/N)");
+                        String response = Console.ReadLine();
+                        switch (response)
+                        {
+                            case "Y":
+                                fileTransfer.createNewTarget();
+                                break;
+                            case "N":
+                                doneTargets = true;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
                     Boolean done = false;
                     int i = 0;
                     while (!done)
                     {
                         Console.WriteLine("[E]xit [Y]es [Any key to continue]");
-                        RemoteFileInfo expedition = expenditions[i];
-                        Console.WriteLine("Would you like to organize {0}(Y/N)?", expedition.Name);
+                        RemoteFileInfo aSourceFile = sourceFiles[i];
+                        Console.WriteLine("Would you like to organize {0}(Y/N)?", aSourceFile.Name);
                         String answer = Console.ReadLine();
                         switch (answer)
                         {
                             case "Y":
-                                FileTransferManager fileTransfer = new FileTransferManager(path, session, expedition);
-                                fileTransfer.createNewTarget();
+                                fileTransfer.setCurrentTransferSrc(aSourceFile); // set the path to the current source 
+                                fileTransfer.checkDestinationDir();              // set path to destination of transfer
+                                fileTransfer.setTargetSrcPaths();                // set the paths of the targets
+                                fileTransfer.transferTargets();                  // transfer the target files
                                 break;
                             case "N":
                                 break;
