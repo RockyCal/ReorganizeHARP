@@ -126,7 +126,7 @@ namespace ReorganizeHARP
                 Console.WriteLine("Error: Could not find target with name {0}", name);
                 return;
             }
-            target.checkTargetDestination(currentTransferDestPath);
+            target.checkTargetDestination(currentTransferDestPath, currentTransfer.Name);
             target.findTargetFiles();
         }
 
