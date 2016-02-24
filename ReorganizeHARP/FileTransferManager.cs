@@ -99,8 +99,8 @@ namespace ReorganizeHARP
             // TODO: change lines below so that program simply finds "deploy" or "Deploy"
             //       then cross references with DB to find which datalogger folder it is and  gets files from there
             Console.WriteLine("Set target path (where to find your target's files) e.g. deploy/dl32 for {0}: ", target.name);
-            String targetPath = Console.ReadLine();
-            String fullpath = currentTransferSrcPath + '/' + targetPath;
+            target.srcRelPath = Console.ReadLine();
+            String fullpath = currentTransferSrcPath + '/' + target.srcRelPath;
             target.setFullSrcPath(fullpath);
             return;
         }

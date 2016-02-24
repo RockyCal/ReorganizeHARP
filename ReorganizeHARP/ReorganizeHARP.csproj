@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="FileTransferManager.cs" />
     <Compile Include="FileTransferRule.cs" />
+    <Compile Include="FileTransferRuleCondition.cs" />
     <Compile Include="FileTransferTarget.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
