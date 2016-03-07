@@ -80,10 +80,10 @@ namespace ReorganizeHARP
             public int quantity;
         }
 
-        public FileTransferRule(String name, Severity severity)
+        public FileTransferRule(String ruleName, Severity ruleSeverity)
         {
-            this.name = name;
-            this.severity = severity;
+            name = ruleName;
+            severity = ruleSeverity;
         }
 
         public FileTransferRule(String name, Severity severity, String path)
@@ -91,6 +91,11 @@ namespace ReorganizeHARP
             this.name = name;
             this.severity = severity;
             this.path = path;
+        }
+
+        public void configure()
+        {
+            setRulePath();
         }
 
         public void setRulePath()

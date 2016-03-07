@@ -118,6 +118,7 @@ namespace ReorganizeHARP
                                 fileTransfer.setCurrentTransferSrc(aSourceFile); // set the path to the current source 
                                 fileTransfer.checkDestinationDir();              // set path to destination of transfer
                                 fileTransfer.setTargetSrcPaths();                // set the paths of the targets
+                                fileTransfer.configureTargetRules();             // configure target rules
                                 fileTransfer.transferTargets();                  // transfer the target files
                                 break;
                             case "N":

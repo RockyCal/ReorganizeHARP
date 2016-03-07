@@ -113,6 +113,14 @@ namespace ReorganizeHARP
             }
         }
 
+        public void configureTargetRules()
+        {
+            foreach(FileTransferTarget target in targets)
+            {
+                target.addRule();
+            }
+        }
+
         public void getTarget(String name)
         {
             Console.WriteLine("Transfering files for {0}", name);
