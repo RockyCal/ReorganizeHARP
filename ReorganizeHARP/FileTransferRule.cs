@@ -72,18 +72,31 @@ namespace ReorganizeHARP
         public Severity severity;           // hardness of rule
         public String path;                 // path to directory/file needed to follow rule, if target source path does not have it
         public Boolean fulfilled;
+        public Conditions conditions;
+
         public struct Conditions
         {
             public Boolean isDir;
             public String nameScheme;
+            public Boolean isNameScheme;
             public String extension;
             public int quantity;
+
+            public Conditions(Boolean isDirectory, String nameSchm, Boolean isNScheme, String ext, int qty)
+            {
+                isDir = isDirectory;
+                nameScheme = nameSchm;
+                isNameScheme = isNScheme;
+                extension = ext;
+                quantity = qty;
+            }
         }
 
         public FileTransferRule(String ruleName, Severity ruleSeverity)
         {
             name = ruleName;
             severity = ruleSeverity;
+            conditions = new Conditions();
         }
 
         public FileTransferRule(String name, Severity severity, String path)
@@ -91,6 +104,7 @@ namespace ReorganizeHARP
             this.name = name;
             this.severity = severity;
             this.path = path;
+            conditions = new Conditions();
         }
 
         public void configure()
@@ -117,9 +131,28 @@ namespace ReorganizeHARP
             }
         }
 
-        /*public void setRuleConditions()
+        public void setConditions()
         {
-
-        }*/
+            Console.WriteLine("Set conditions for {0}'s rule {1}", target, name);
+            Console.WriteLine("Is the goal of this rule to ensure transfer of a (D)irectory or a single (F)ile?");
+            String fileOption = Console.ReadLine();
+            Boolean isDirectory = false;
+            switch (fileOption)
+            {
+                case "d":
+                case "D":
+                    isDirectory = true;
+                    break;
+                case "f":
+                case "F":
+                    isDirectory = false;
+                    break;
+                default:
+                    break;
+            }
+            Console.WriteLine("How many of {0} to transfer?", isDirectory ? "directory" : "file");
+            // TO DO: convert to int
+            String qty = Console.ReadLine();
+        }
     }
 }

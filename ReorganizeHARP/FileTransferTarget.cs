@@ -95,6 +95,7 @@ namespace ReorganizeHARP
             }
             FileTransferRule rule = new FileTransferRule(ruleName, ruleSev);
             rule.target = this;
+            rule.setConditions();
             rule.setRulePath();
             rules.Add(rule);
         }
